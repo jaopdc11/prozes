@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, develop, feature/*]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Check formatting with Black
+        run: |
+          black --check --diff prozes tests
+
+      - name: Lint with Ruff
+        run: |
+          ruff check prozes tests
+
+      - name: Type check with mypy
+        run: |
+          mypy prozes --ignore-missing-imports
